@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# run docker
+docker run --rm -it -d \
+    --name azure-cli \
+    -v "$HOME/.azure:/root/.azure" \
+    -v "$PWD:/root/app" \
+    --workdir /root/app \
+    mcr.microsoft.com/azure-cli:latest
+
+# check if session exists
+if [ ! -f "$HOME/.azure/msal_token_cache.json" ]; then
+    # open devicelogin page in a new tab
+    python -m webbrowser -t https://microsoft.com/devicelogin
+
+    # login to Azure
+    docker exec azure-cli az login
+fi
+
+# attach
+docker attach azure-cli
